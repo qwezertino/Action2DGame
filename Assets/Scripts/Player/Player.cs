@@ -9,11 +9,26 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private float _minMovingSpeed = 0.1f;
     private bool _moving = false;
+    private Vector2 inputVector = Vector2.zero;
 
     private void Awake()
     {
         Instance = this;
         _rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        GameInput.Instance.OnPlayerAttack += GameInput_OnPlayerAttack;
+    }
+
+    private void GameInput_OnPlayerAttack(object sender, System.EventArgs e)
+    {
+        ActiveWeapon.Instance.GetActiveWeapon().Attack();
+    }
+    private void Update()
+    {
+        inputVector = GameInput.Instance.GetMovementVector();
     }
     private void FixedUpdate()
     {
@@ -21,7 +36,7 @@ public class Player : MonoBehaviour
     }
     private void HandleMovement()
     {
-        Vector2 inputVector = GameInput.Instance.GetMovementVector();
+
         _rigidbody.MovePosition(_rigidbody.position + inputVector * (_movingSpeed * Time.fixedDeltaTime));
 
         if (Mathf.Abs(inputVector.x) > _minMovingSpeed || Mathf.Abs(inputVector.y) > _minMovingSpeed)
